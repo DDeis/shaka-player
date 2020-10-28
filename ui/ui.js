@@ -192,6 +192,7 @@ shaka.ui.Overlay = class {
       showUnbufferedStart: false,
       seekBarColors: {
         base: 'rgba(255, 255, 255, 0.3)',
+        live: 'rgba(255, 255, 255, 0.4)',
         buffered: 'rgba(255, 255, 255, 0.54)',
         played: 'rgb(255, 255, 255)',
         adBreaks: 'rgb(255, 204, 0)',

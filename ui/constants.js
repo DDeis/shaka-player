@@ -7,8 +7,14 @@
 
 goog.provide('shaka.ui.Constants');
 
-/** @const {string} */
+/**
+ * @const {string}
+ * @export
+ */
 shaka.ui.Constants.ARIA_LABEL = 'aria-label';
 
-/** @const {number} */
+/**
+ * @const {number}
+ * @export
+ */
 shaka.ui.Constants.MIN_SEEK_WINDOW_TO_SHOW_SEEKBAR = 5; // seconds

@@ -41,7 +41,7 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
           'shaka-show-controls-on-mouse-over',
         ]);
 
-    /** @private {!HTMLElement} */
+    /** @protected {!HTMLElement} */
     this.adMarkerContainer_ = shaka.util.Dom.createHTMLElement('div');
     this.adMarkerContainer_.classList.add('shaka-ad-markers');
     // Insert the ad markers container as a first child for proper
@@ -50,14 +50,14 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
         this.adMarkerContainer_, this.container.childNodes[0]);
 
 
-    /** @private {!shaka.extern.UIConfiguration} */
+    /** @protected {!shaka.extern.UIConfiguration} */
     this.config_ = this.controls.getConfig();
 
     /**
      * This timer is used to introduce a delay between the user scrubbing across
      * the seek bar and the seek being sent to the player.
      *
-     * @private {shaka.util.Timer}
+     * @protected {shaka.util.Timer}
      */
     this.seekTimer_ = new shaka.util.Timer(() => {
       this.video.currentTime = this.getValue();
@@ -68,10 +68,10 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
      * The timer is activated for live content and checks if
      * new ad breaks need to be marked in the current seek range.
      *
-     * @private {shaka.util.Timer}
+     * @protected {shaka.util.Timer}
      */
     this.adBreaksTimer_ = new shaka.util.Timer(() => {
-      this.markAdBreaks_();
+      this.markAdBreaks();
     });
 
     /**
@@ -79,20 +79,20 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
      * but will conditionally pause or play the video after scrubbing
      * depending on its previous state
      *
-     * @private {boolean}
+     * @protected {boolean}
      */
     this.wasPlaying_ = false;
 
-    /** @private {!Array.<!shaka.ads.CuePoint>} */
+    /** @protected {!Array.<!shaka.ads.CuePoint>} */
     this.adCuePoints_ = [];
 
     this.eventManager.listen(this.localization,
         shaka.ui.Localization.LOCALE_UPDATED,
-        () => this.updateAriaLabel_());
+        () => this.updateAriaLabel());
 
     this.eventManager.listen(this.localization,
         shaka.ui.Localization.LOCALE_CHANGED,
-        () => this.updateAriaLabel_());
+        () => this.updateAriaLabel());
 
     this.eventManager.listen(
         this.adManager, shaka.ads.AdManager.AD_STARTED, () => {
@@ -101,7 +101,7 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
 
     this.eventManager.listen(
         this.adManager, shaka.ads.AdManager.AD_STOPPED, () => {
-          if (this.shouldBeDisplayed_()) {
+          if (this.shouldBeDisplayed()) {
             shaka.ui.Utils.setDisplay(this.container, true);
           }
         });
@@ -121,7 +121,7 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
     // Initialize seek state and label.
     this.setValue(this.video.currentTime);
     this.update();
-    this.updateAriaLabel_();
+    this.updateAriaLabel();
   }
 
   /** @override */
@@ -216,7 +216,7 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
 
     this.setRange(seekRange.start, seekRange.end);
 
-    if (!this.shouldBeDisplayed_()) {
+    if (!this.shouldBeDisplayed()) {
       shaka.ui.Utils.setDisplay(this.container, false);
     } else {
       shaka.ui.Utils.setDisplay(this.container, true);
@@ -244,12 +244,12 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
 
         const gradient = [
           'to right',
-          this.makeColor_(unbufferedColor, bufferStartFraction),
-          this.makeColor_(colors.played, bufferStartFraction),
-          this.makeColor_(colors.played, playheadFraction),
-          this.makeColor_(colors.buffered, playheadFraction),
-          this.makeColor_(colors.buffered, bufferEndFraction),
-          this.makeColor_(colors.base, bufferEndFraction),
+          this.makeColor(unbufferedColor, bufferStartFraction),
+          this.makeColor(colors.played, bufferStartFraction),
+          this.makeColor(colors.played, playheadFraction),
+          this.makeColor(colors.buffered, playheadFraction),
+          this.makeColor(colors.buffered, bufferEndFraction),
+          this.makeColor(colors.base, bufferEndFraction),
         ];
         this.container.style.background =
             'linear-gradient(' + gradient.join(',') + ')';
@@ -258,9 +258,9 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
   }
 
   /**
-   * @private
+   * @protected
    */
-  markAdBreaks_() {
+  markAdBreaks() {
     if (!this.adCuePoints_.length) {
       this.adMarkerContainer_.style.background = 'transparent';
       return;
@@ -302,15 +302,15 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
     }
 
     for (const point of pointsAsFractions) {
-      gradient.push(this.makeColor_('transparent', point.start));
-      gradient.push(this.makeColor_(adBreakColor, point.start));
-      gradient.push(this.makeColor_(adBreakColor, point.end));
-      gradient.push(this.makeColor_('transparent', point.end));
+      gradient.push(this.makeColor('transparent', point.start));
+      gradient.push(this.makeColor(adBreakColor, point.start));
+      gradient.push(this.makeColor(adBreakColor, point.end));
+      gradient.push(this.makeColor('transparent', point.end));
     }
 
     if (postRollAd) {
-      gradient.push(this.makeColor_('transparent', 0.99));
-      gradient.push(this.makeColor_(adBreakColor, 0.99));
+      gradient.push(this.makeColor('transparent', 0.99));
+      gradient.push(this.makeColor(adBreakColor, 0.99));
     }
     this.adMarkerContainer_.style.background =
             'linear-gradient(' + gradient.join(',') + ')';
@@ -321,9 +321,10 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
    * @param {string} color
    * @param {number} fract
    * @return {string}
-   * @private
+   * @protected
+   * @exportInterface
    */
-  makeColor_(color, fract) {
+  makeColor(color, fract) {
     return color + ' ' + (fract * 100) + '%';
   }
 
@@ -332,7 +333,7 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
    * @private
    */
   onAdCuePointsChanged_() {
-    this.markAdBreaks_();
+    this.markAdBreaks();
     const seekRange = this.player.seekRange();
     const seekRangeSize = seekRange.end - seekRange.start;
     const minSeekBarWindow = shaka.ui.Constants.MIN_SEEK_WINDOW_TO_SHOW_SEEKBAR;
@@ -349,9 +350,10 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
 
   /**
    * @return {boolean}
-   * @private
+   * @protected
+   * @exportInterface
    */
-  shouldBeDisplayed_() {
+  shouldBeDisplayed() {
     // The seek bar should be hidden when the seek window's too small or
     // there's an ad playing.
     const seekRange = this.player.seekRange();
@@ -365,8 +367,8 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
     return this.ad == null;
   }
 
-  /** @private */
-  updateAriaLabel_() {
+  /** @protected */
+  updateAriaLabel() {
     this.bar.setAttribute(shaka.ui.Constants.ARIA_LABEL,
         this.localization.resolve(shaka.ui.Locales.Ids.SEEK));
   }

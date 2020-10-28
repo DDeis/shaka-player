@@ -12,11 +12,15 @@ goog.require('shaka.ui.Enums');
 goog.require('shaka.util.Dom');
 
 
+/**
+ * @export
+ */
 shaka.ui.Utils = class {
   /**
    * @param {!HTMLElement} element
    * @param {string} className
    * @return {!HTMLElement}
+   * @export
    */
   // TODO: This can be replaced by shaka.util.Dom.getElementByClassName
   static getFirstDescendantWithClassName(element, className) {
@@ -31,6 +35,7 @@ shaka.ui.Utils = class {
    * @param {!HTMLElement} element
    * @param {string} className
    * @return {?HTMLElement}
+   * @export
    */
   static getDescendantIfExists(element, className) {
     const childrenWithClassName = element.getElementsByClassName(className);
@@ -47,6 +52,7 @@ shaka.ui.Utils = class {
    * and focuses on its' parent.
    *
    * @param {HTMLElement} menu
+   * @export
    */
   static focusOnTheChosenItem(menu) {
     if (!menu) {
@@ -62,6 +68,7 @@ shaka.ui.Utils = class {
 
   /**
    * @return {!Element}
+   * @export
    */
   static checkmarkIcon() {
     const icon = shaka.util.Dom.createHTMLElement('i');
@@ -80,6 +87,7 @@ shaka.ui.Utils = class {
    *
    * @param {Element} element
    * @param {boolean} display
+   * @export
    */
   static setDisplay(element, display) {
     if (!element) {
@@ -108,6 +116,7 @@ shaka.ui.Utils = class {
    * @param {number} displayTime (in seconds)
    * @param {boolean} showHour
    * @return {string}
+   * @export
    */
   static buildTimeString(displayTime, showHour) {
     const h = Math.floor(displayTime / 3600);
