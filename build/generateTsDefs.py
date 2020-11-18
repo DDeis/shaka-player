@@ -91,6 +91,7 @@ def GenerateTsDefs(inputs, output):
       lambda s: not s.startswith(b'// Generated from externs.zip'),
       sections)
   contents = b'\n'.join(sections) + b'\n'
+  contents += '\n' + 'export = shaka;' + '\n'
 
   license_header_path = os.path.join(
       shakaBuildHelpers.get_source_base(), 'build/license-header')

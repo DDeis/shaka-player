@@ -61,7 +61,7 @@ shaka.extern.UIVolumeBarColors;
  * The UI's configuration options.
  *
  * @typedef {{
- *   controlPanelElements: !Array.<string>,
+ *   controlPanelElements: !Array.<string|Array.<string>>,
  *   overflowMenuButtons: !Array.<string>,
  *   addSeekBar: boolean,
  *   addBigPlayButton: boolean,
@@ -78,7 +78,7 @@ shaka.extern.UIVolumeBarColors;
  *   forceLandscapeOnFullscreen: boolean
  * }}
  *
- * @property {!Array.<string>} controlPanelElements
+ * @property {!Array.<string|Array.<string>>} controlPanelElements
  *   The ordered list of control panel elements of the UI.
  * @property {!Array.<string>} overflowMenuButtons
  *   The ordered list of the overflow menu buttons.
