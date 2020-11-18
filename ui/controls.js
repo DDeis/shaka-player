@@ -355,6 +355,15 @@ shaka.ui.Controls = class extends shaka.util.FakeEventTarget {
   }
 
   /**
+   * @param {string} name
+   * @return {!shaka.extern.IUIElement.Factory}
+   * @export
+   */
+  static getRegisteredElement(name) {
+    return shaka.ui.ControlsPanel.elementNamesToFactories_.get(name);
+  }
+
+  /**
    * @param {!shaka.extern.IUISeekBar.Factory} factory
    * @export
    */
@@ -424,6 +433,14 @@ shaka.ui.Controls = class extends shaka.util.FakeEventTarget {
       this.eventManager_.listen(element, 'click', cb);
       this.eventManager_.listen(element, 'dblclick', cb);
     }
+  }
+
+  /**
+   * @param {shaka.extern.IUISeekBar} seekBar
+   * @export
+   */
+  setSeekBar(seekBar) {
+    this.seekBar_ = seekBar;
   }
 
   /**
@@ -1136,6 +1153,7 @@ shaka.ui.Controls = class extends shaka.util.FakeEventTarget {
 
   /**
    * Recompute whether the controls should be shown or hidden.
+   * @export
    */
   computeOpacity() {
     const adIsPaused = this.ad_ ? this.ad_.isPaused() : false;
