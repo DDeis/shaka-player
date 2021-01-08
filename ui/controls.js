@@ -115,6 +115,7 @@ shaka.ui.Controls = class extends shaka.util.FakeEventTarget {
      */
     this.fadeControlsTimer_ = new shaka.util.Timer(() => {
       this.controlsContainer_.removeAttribute('shown');
+      this.dispatchEvent(new shaka.util.FakeEvent('uicontrolshidden'));
 
       // If there's an overflow menu open, keep it this way for a couple of
       // seconds in case a user immediately initiates another mouse move to
@@ -341,6 +342,24 @@ shaka.ui.Controls = class extends shaka.util.FakeEventTarget {
    *    updating.
    * @property {string} type
    *   'uiupdated'
+   * @exportDoc
+   */
+
+
+  /**
+   * @event shaka.ui.Controls.UIControlsHiddenEvent
+   * @description Fired when the ui controls visibility change.
+   * @property {string} type
+   *   'uicontrolshidden'
+   * @exportDoc
+   */
+
+
+  /**
+   * @event shaka.ui.Controls.UIControlsVisibleEvent
+   * @description Fired when the ui controls visibility change.
+   * @property {string} type
+   *   'uicontrolsvisible'
    * @exportDoc
    */
 
@@ -860,43 +879,63 @@ shaka.ui.Controls = class extends shaka.util.FakeEventTarget {
 
     this.addAdControls_();
 
-    /** @private {!HTMLElement} */
-    this.controlsButtonPanel_ = shaka.util.Dom.createHTMLElement('div');
-    this.controlsButtonPanel_.classList.add('shaka-controls-button-panel');
-    this.controlsButtonPanel_.classList.add(
+    // /** @private {!HTMLElement} */
+    // this.controlsButtonPanel_ =
+    this.createControlsButtonPanel_(this.config_.controlPanelElements);
+  }
+
+  /** @private */
+  createControlsButtonPanel_(elements) {
+    // /** @private {!HTMLElement} */
+    // this.controlsButtonPanel_ = shaka.util.Dom.createHTMLElement('div');
+    // this.controlsButtonPanel_.classList.add('shaka-controls-button-panel');
+    // this.controlsButtonPanel_.classList.add(
+    //     'shaka-show-controls-on-mouse-over');
+    // this.bottomControls_.appendChild(this.controlsButtonPanel_);
+
+    const controlsButtonPanel = shaka.util.Dom.createHTMLElement('div');
+    controlsButtonPanel.classList.add('shaka-controls-button-panel');
+    controlsButtonPanel.classList.add(
         'shaka-show-controls-on-mouse-over');
-    this.bottomControls_.appendChild(this.controlsButtonPanel_);
+    this.bottomControls_.appendChild(controlsButtonPanel);
 
     // Create the elements specified by controlPanelElements
-    for (const name of this.config_.controlPanelElements) {
-      if (shaka.ui.ControlsPanel.elementNamesToFactories_.get(name)) {
-        const factory =
-            shaka.ui.ControlsPanel.elementNamesToFactories_.get(name);
-        const element = factory.create(this.controlsButtonPanel_, this);
-
-        if (typeof element.release != 'function') {
-          shaka.Deprecate.deprecateFeature(4,
-              'shaka.extern.IUIElement',
-              'Please update UI elements to have a release() method.');
-
-          // This cast works around compiler strictness about the IUIElement
-          // type being "@struct" (as ES6 classes are by default).
-          const moddableElement = /** @type {Object} */(element);
-          moddableElement['release'] = () => {
-            if (moddableElement['destroy']) {
-              moddableElement['destroy']();
-            }
-          };
-        }
-
-        this.elements_.push(element);
+    for (const element of elements) {
+      if (Array.isArray(element)) {
+        this.createControlsButtonPanel_(element);
       } else {
-        shaka.log.alwaysWarn('Unrecognized control panel element requested:',
-            name);
+        this.createControlPanelElement_(element, controlsButtonPanel);
       }
     }
   }
 
+  /** @private */
+  createControlPanelElement_(name, parent) {
+    if (shaka.ui.ControlsPanel.elementNamesToFactories_.get(name)) {
+      const factory = shaka.ui.ControlsPanel.elementNamesToFactories_.get(name);
+      const element = factory.create(parent, this);
+
+      if (typeof element.release != 'function') {
+        shaka.Deprecate.deprecateFeature(4,
+            'shaka.extern.IUIElement',
+            'Please update UI elements to have a release() method.');
+
+        // This cast works around compiler strictness about the IUIElement
+        // type being "@struct" (as ES6 classes are by default).
+        const moddableElement = /** @type {Object} */ (element);
+        moddableElement['release'] = () => {
+          if (moddableElement['destroy']) {
+            moddableElement['destroy']();
+          }
+        };
+      }
+
+      this.elements_.push(element);
+    } else {
+      shaka.log.alwaysWarn('Unrecognized control panel element requested:',
+          name);
+    }
+  }
 
   /**
    * Adds a container for server side ad UI with IMA SDK.
@@ -1173,6 +1212,7 @@ shaka.ui.Controls = class extends shaka.util.FakeEventTarget {
       this.updateTimeAndSeekRange_();
 
       this.controlsContainer_.setAttribute('shown', 'true');
+      this.dispatchEvent(new shaka.util.FakeEvent('uicontrolsvisible'));
       this.fadeControlsTimer_.stop();
     } else {
       this.fadeControlsTimer_.tickAfter(/* seconds= */ this.config_.fadeDelay);

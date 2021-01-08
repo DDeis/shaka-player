@@ -57,7 +57,7 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
      * This timer is used to introduce a delay between the user scrubbing across
      * the seek bar and the seek being sent to the player.
      *
-     * @private {shaka.util.Timer}
+     * @protected {shaka.util.Timer}
      */
     this.seekTimer_ = new shaka.util.Timer(() => {
       this.video.currentTime = this.getValue();
@@ -122,6 +122,13 @@ shaka.ui.SeekBar = class extends shaka.ui.RangeElement {
     this.setValue(this.video.currentTime);
     this.update();
     this.updateAriaLabel_();
+  }
+
+  /**
+   * @export
+   */
+  setSeekTimer(seekTimer) {
+    this.seekTimer_ = seekTimer;
   }
 
   /** @override */
